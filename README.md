@@ -1,4 +1,4 @@
-# 🏥 Hospital Healthcare System Backend (DRF-Based)
+# 🏥 Hospital Healthcare System 
 
 ## 🔧 Stack Overview
 - **Backend**: Django + Django Rest Framework (DRF)
