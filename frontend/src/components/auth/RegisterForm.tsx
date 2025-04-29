@@ -3,39 +3,42 @@ import { UserPlus, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
+import { useNavigate } from 'react-router-dom';
 
 interface RegisterFormProps {
   onToggleForm: () => void;
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
-  const [name, setName] = useState<string>('');
+  const [username, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [role, setRole] = useState<'patient' | 'doctor'>('patient');
-  const [formErrors, setFormErrors] = useState<{ 
-    name?: string; 
-    email?: string; 
+  const [formErrors, setFormErrors] = useState<{
+    username?: string;
+    email?: string;
     password?: string;
     confirmPassword?: string;
   }>({});
-  const { register, loading, error } = useAuth();
-  
+  const { registerUser } = useAuth();
+
   const validateForm = (): boolean => {
-    const errors: { 
-      name?: string; 
-      email?: string; 
+    const errors: {
+      username?: string;
+      email?: string;
       password?: string;
       confirmPassword?: string;
     } = {};
     let isValid = true;
-    
-    if (!name) {
-      errors.name = 'Name is required';
+
+    if (!username) {
+      errors.username = 'username is required';
       isValid = false;
     }
-    
+
     if (!email) {
       errors.email = 'Email is required';
       isValid = false;
@@ -43,7 +46,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
       errors.email = 'Email is invalid';
       isValid = false;
     }
-    
+
     if (!password) {
       errors.password = 'Password is required';
       isValid = false;
@@ -51,7 +54,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
       errors.password = 'Password must be at least 6 characters';
       isValid = false;
     }
-    
+
     if (!confirmPassword) {
       errors.confirmPassword = 'Please confirm your password';
       isValid = false;
@@ -59,49 +62,47 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
       errors.confirmPassword = 'Passwords do not match';
       isValid = false;
     }
-    
+
     setFormErrors(errors);
     return isValid;
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       try {
-        await register({ name, email, role }, password);
+        await registerUser( username, email, password, role);
+        setSuccess(true);
+        navigate('/login')
       } catch (err) {
         // Error is handled by the auth context
       }
     }
   };
-  
+
   return (
     <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
       <div className="text-center mb-6">
         <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
         <p className="mt-2 text-gray-600">Sign up to get started with telemedicine</p>
       </div>
-      
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-      
+      {success ? (
+        <p className="text-green-500">Registration successful!</p>
+      ) : (
       <form onSubmit={handleSubmit} className="space-y-6">
         <Input
           type="text"
           label="Full Name"
-          value={name}
+          value={username}
           onChange={(e) => setName(e.target.value)}
           leftIcon={<User className="h-5 w-5 text-gray-400" />}
           placeholder="John Doe"
-          error={formErrors.name}
-          autoComplete="name"
+          error={formErrors.username}
+          autoComplete="username"
           required
         />
-        
+
         <Input
           type="email"
           label="Email Address"
@@ -113,7 +114,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
           autoComplete="email"
           required
         />
-        
+
         <Input
           type="password"
           label="Password"
@@ -125,7 +126,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
           autoComplete="new-password"
           required
         />
-        
+
         <Input
           type="password"
           label="Confirm Password"
@@ -137,7 +138,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
           autoComplete="new-password"
           required
         />
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             I am a:
@@ -163,17 +164,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
             </label>
           </div>
         </div>
-        
+
         <Button
           type="submit"
           fullWidth
-          isLoading={loading}
           leftIcon={<UserPlus className="h-5 w-5" />}
         >
           Create Account
         </Button>
       </form>
-      
+      )}
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -183,7 +183,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
             <span className="px-2 bg-white text-gray-500">Or</span>
           </div>
         </div>
-        
+
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{' '}

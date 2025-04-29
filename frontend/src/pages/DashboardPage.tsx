@@ -10,46 +10,46 @@ import Button from '../components/ui/Button';
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   // Filter appointments relevant to the current user
-  const userAppointments = mockAppointments.filter(apt => 
-    user?.role === 'patient' ? apt.patientId === user.id : apt.doctorId === user.id
+  const userAppointments = mockAppointments.filter(apt =>
+    user?.role === 'patient' ? Number(apt.patientId) === user.id : Number(apt.doctorId) === user?.id
   );
-  
+
   // Get upcoming appointments
   const upcomingAppointments = userAppointments
     .filter(apt => apt.status === 'scheduled')
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 3);
-  
+
   // Get recent medical records if user is a patient
-  const recentMedicalRecords = user?.role === 'patient' 
+  const recentMedicalRecords = user?.role === 'patient'
     ? mockMedicalRecords
-        .filter(record => record.patientId === user.id)
+        .filter(record => Number(record.patientId) === user.id)
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 2)
     : [];
-  
+
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { weekday: 'short', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
-  
+
   const handleJoinCall = (appointmentId: string) => {
     navigate(`/video-call/${appointmentId}`);
   };
-  
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          Welcome, {user?.name}!
+          Welcome, {user?.full_name}!
         </h1>
         <p className="text-gray-500 mt-1">
           Here's what's happening with your health today
         </p>
       </div>
-      
+
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
@@ -74,8 +74,8 @@ const DashboardPage: React.FC = () => {
             path: user?.role === 'patient' ? "/doctors" : "/patients"
           }
         ].map((action, index) => (
-          <Card 
-            key={index} 
+          <Card
+            key={index}
             className="flex items-center p-5 cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => navigate(action.path)}
           >
@@ -86,7 +86,7 @@ const DashboardPage: React.FC = () => {
           </Card>
         ))}
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Appointments */}
         <div className="lg:col-span-2">
@@ -94,8 +94,8 @@ const DashboardPage: React.FC = () => {
             <Card.Header
               title="Upcoming Appointments"
               action={
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => navigate('/appointments')}
                 >
@@ -148,7 +148,7 @@ const DashboardPage: React.FC = () => {
             </Card.Content>
           </Card>
         </div>
-        
+
         {/* Health Summary / Doctor Schedule */}
         <div>
           {user?.role === 'patient' ? (
@@ -165,12 +165,12 @@ const DashboardPage: React.FC = () => {
                     <span className="font-medium">Next Appointment</span>
                   </div>
                   <span>
-                    {upcomingAppointments.length > 0 
-                      ? formatDate(upcomingAppointments[0].date) 
+                    {upcomingAppointments.length > 0
+                      ? formatDate(upcomingAppointments[0].date)
                       : 'None scheduled'}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center">
                     <div className="p-2 bg-green-100 rounded-full mr-3">
@@ -182,7 +182,7 @@ const DashboardPage: React.FC = () => {
                     3
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center">
                     <div className="p-2 bg-purple-100 rounded-full mr-3">
@@ -190,15 +190,15 @@ const DashboardPage: React.FC = () => {
                     </div>
                     <span className="font-medium">Health Records</span>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => navigate('/medical-records')}
                   >
                     View
                   </Button>
                 </div>
-                
+
                 {recentMedicalRecords.length > 0 && (
                   <div className="mt-6">
                     <h4 className="font-medium mb-2">Recent Medical Records</h4>
@@ -223,7 +223,7 @@ const DashboardPage: React.FC = () => {
                 title="Today's Schedule"
               />
               <Card.Content>
-                {upcomingAppointments.filter(apt => 
+                {upcomingAppointments.filter(apt =>
                   new Date(apt.date).toDateString() === new Date().toDateString()
                 ).length > 0 ? (
                   <div className="space-y-3">
@@ -238,7 +238,7 @@ const DashboardPage: React.FC = () => {
                             <div className="font-medium">{apt.patientName}</div>
                             <div className="text-sm text-gray-500">{apt.reason}</div>
                           </div>
-                          <Button 
+                          <Button
                             size="sm"
                             onClick={() => handleJoinCall(apt.id)}
                           >

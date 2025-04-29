@@ -12,25 +12,25 @@ import MedicalRecordsPage from './pages/MedicalRecordsPage';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
-  
+  const { isAuthenticated } = useAuth();
+
   // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500 mx-auto mb-4"></div>
+  //         <p className="text-gray-600">Loading...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -40,7 +40,7 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthPage defaultView="login" />} />
       <Route path="/register" element={<AuthPage defaultView="register" />} />
-      
+
       <Route
         path="/dashboard"
         element={
@@ -51,7 +51,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/appointments"
         element={
@@ -62,7 +62,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/video-call/:appointmentId"
         element={
@@ -71,7 +71,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/messages"
         element={
@@ -82,7 +82,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/medical-records"
         element={
@@ -93,7 +93,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       {/* Catch-all route - redirect to dashboard if authenticated, otherwise to landing page */}
       <Route
         path="*"

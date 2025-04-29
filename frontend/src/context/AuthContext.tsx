@@ -1,140 +1,73 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, AuthState } from '../types';
-import { mockUsers } from '../data/mockData';
+import React, { createContext, useState, useEffect, useContext } from "react";
+import {
+  getCurrentUser,
+  login,
+  register,
+  // logout as doLogout,
+} from "../services/authService";
+import { UserProfile } from "../types/auth";
 
-interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
+interface AuthContextType {
+  user: UserProfile | null;
+  loginUser: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (userData: Partial<User>, password: string) => Promise<void>;
+  registerUser: (username: string, email: string, password: string, role: 'patient' | 'doctor') => Promise<void>;
+  isAuthenticated: boolean;
 }
 
-const initialState: AuthState = {
-  isAuthenticated: false,
-  user: null,
-  loading: true,
-  error: null,
-};
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AuthContext = createContext<AuthContextType>({
-  ...initialState,
-  login: async () => {},
-  logout: () => {},
-  register: async () => {},
-});
-
-export const useAuth = () => useContext(AuthContext);
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>(initialState);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    // Check for saved user in localStorage (simulating persistence)
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
+    const fetchUser = async () => {
       try {
-        const user = JSON.parse(savedUser);
-        setAuthState({
-          isAuthenticated: true,
-          user,
-          loading: false,
-          error: null,
-        });
-      } catch (error) {
-        localStorage.removeItem('user');
-        setAuthState({ ...initialState, loading: false });
+        const u = await getCurrentUser();
+        setUser(u);
+      } catch {
+        setUser(null);
       }
-    } else {
-      setAuthState({ ...initialState, loading: false });
-    }
+    };
+    fetchUser();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    setAuthState({ ...authState, loading: true, error: null });
-    
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, we'll use a mock login
-      const user = mockUsers.find(u => u.email === email);
-      
-      if (user && password === 'password') { // In a real app, we'd verify hashed passwords
-        localStorage.setItem('user', JSON.stringify(user));
-        setAuthState({
-          isAuthenticated: true,
-          user,
-          loading: false,
-          error: null,
-        });
-      } else {
-        throw new Error('Invalid credentials');
-      }
-    } catch (error) {
-      setAuthState({
-        ...authState,
-        loading: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
-      });
-    }
+  const loginUser = async (email: string, password: string) => {
+    await login({ email, password });
+    const u = await getCurrentUser();
+    setUser(u);
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
-    setAuthState({
-      isAuthenticated: false,
-      user: null,
-      loading: false,
-      error: null,
-    });
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    setUser(null);
   };
 
-  const register = async (userData: Partial<User>, password: string) => {
-    setAuthState({ ...authState, loading: true, error: null });
-    
+  const registerUser = async (username: string, email: string, password: string, role: 'patient' | 'doctor') => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Check if email already exists
-      const emailExists = mockUsers.some(u => u.email === userData.email);
-      
-      if (emailExists) {
-        throw new Error('Email already registered');
-      }
-      
-      // In a real app, we would create a new user in the database
-      // For demo purposes, we'll just set the user as logged in
-      const newUser = {
-        id: `user-${Date.now()}`,
-        name: userData.name || '',
-        email: userData.email || '',
-        role: userData.role || 'patient',
-      } as User;
-      
-      localStorage.setItem('user', JSON.stringify(newUser));
-      setAuthState({
-        isAuthenticated: true,
-        user: newUser,
-        loading: false,
-        error: null,
-      });
+      await register({ username, email, password, role });
+      const u = await getCurrentUser();
+      setUser(u);
     } catch (error) {
-      setAuthState({
-        ...authState,
-        loading: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
-      });
+      console.error('Registration failed:', error);
     }
   };
 
+
   return (
-    <AuthContext.Provider value={{ 
-      ...authState, 
-      login, 
-      logout, 
-      register 
-    }}>
+    <AuthContext.Provider
+      value={{ user, loginUser, logout, registerUser ,isAuthenticated: !!user }}
+    >
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
 };
