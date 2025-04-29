@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TeleMed Kenya - fastmed." />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <title>FASTMED KENTA</title>
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Load fonts -->
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+      rel="stylesheet"
+    />
+    
+    <!-- Meta tags for social sharing -->
+    <meta property="og:title" content="TeleMed Kenya - Your Trusted Healthcare Partner" />
+    <meta property="og:description" content="Access quality healthcare anywhere in Muranga through secure video consultations with licensed doctors. Schedule appointments, manage records, and more." />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:url" content="https://telemedkenya.com" />
+    
+    <!-- PWA meta tags -->
+    <meta name="theme-color" content="#0D9488" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Apple PWA meta tags -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="TeleMed Kenya" />
+  </head>
+  <body class="font-sans antialiased">
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
+        <h1 style="font-size: 24px; margin-bottom: 16px;">JavaScript Required</h1>
+        <p style="font-size: 16px; color: #666;">
+          TeleMed Kenya requires JavaScript to provide you with the best healthcare experience. 
+          Please enable JavaScript in your browser settings to continue.
+        </p>
+      </div>
+    </noscript>
+    
+    <!-- Application root -->
+    <div id="root"></div>
+    
+    <!-- Loading indicator -->
+    <div id="loading-screen" style="display: none;">
+      <div class="loading-spinner"></div>
+      <p>Loading TeleMed Kenya...</p>
+    </div>
+    
+    <!-- Error boundary fallback -->
+    <div id="error-boundary" style="display: none;">
+      <h1>Something went wrong</h1>
+      <p>We're working to fix the issue. Please try refreshing the page.</p>
+      <button onclick="window.location.reload()">Refresh Page</button>
+    </div>
+    
+    <!-- Main application script -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Offline support -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
