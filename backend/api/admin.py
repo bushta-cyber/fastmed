@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import *
 
 class UserAdmin(BaseUserAdmin):
     ordering = ['email']
@@ -18,3 +18,8 @@ class UserAdmin(BaseUserAdmin):
     )
 
 admin.site.register(User, UserAdmin)
+admin.site.register(MedicalRecord)
+admin.site.register(Appointment)
+admin.site.register(Prescription)
+admin.site.register(Availability)
+admin.site.register(Doctor)

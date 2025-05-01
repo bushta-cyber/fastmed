@@ -1,15 +1,33 @@
-import React from 'react';
+import React, {useEffect, useState}from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, MessageSquare, Clock, BarChart2, Users, PlusCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { mockAppointments, mockDoctors, mockMedicalRecords } from '../data/mockData';
 import Card from '../components/ui/Card';
 import AppointmentCard from '../components/appointments/AppointmentCard';
+import AppointmentService from '../services/appointmentService';
 import Button from '../components/ui/Button';
-
+import { Appointment } from '../types';
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const data = await AppointmentService.getAppointments();
+        setAppointments(data);
+      } catch (err) {
+        setError('Failed to load appointments');
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
 
   // Filter appointments relevant to the current user
   const userAppointments = mockAppointments.filter(apt =>
@@ -19,7 +37,7 @@ const DashboardPage: React.FC = () => {
   // Get upcoming appointments
   const upcomingAppointments = userAppointments
     .filter(apt => apt.status === 'scheduled')
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
     .slice(0, 3);
 
   // Get recent medical records if user is a patient
@@ -104,24 +122,24 @@ const DashboardPage: React.FC = () => {
               }
             />
             <Card.Content>
-              {upcomingAppointments.length > 0 ? (
+              {appointments.length > 0 ? (
                 <div className="space-y-4">
-                  {upcomingAppointments.map(appointment => (
+                  {appointments.map(appointment => (
                     <div key={appointment.id} className="border rounded-lg p-4 hover:bg-gray-50">
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="font-medium">{appointment.reason}</h4>
                           <p className="text-sm text-gray-500">
-                            with {user?.role === 'patient' ? appointment.doctorName : appointment.patientName}
+                            with {user?.role === 'patient' ? appointment.doctor : appointment.patient}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">{formatDate(appointment.date)}</p>
-                          <p className="text-sm text-gray-500">{appointment.startTime} - {appointment.endTime}</p>
+                          <p className="font-medium">{formatDate(appointment.scheduled_time)}</p>
+                          <p className="text-sm text-gray-500">{appointment.scheduled_time} - {appointment.created_at}</p>
                         </div>
                       </div>
                       <div className="mt-3 flex justify-end">
-                        {new Date(appointment.date).toDateString() === new Date().toDateString() && (
+                        {new Date(appointment.scheduled_time).toDateString() === new Date().toDateString() && (
                           <Button
                             size="sm"
                             onClick={() => handleJoinCall(appointment.id)}
@@ -166,7 +184,7 @@ const DashboardPage: React.FC = () => {
                   </div>
                   <span>
                     {upcomingAppointments.length > 0
-                      ? formatDate(upcomingAppointments[0].date)
+                      ? formatDate(upcomingAppointments[0].scheduled_date)
                       : 'None scheduled'}
                   </span>
                 </div>
@@ -224,18 +242,18 @@ const DashboardPage: React.FC = () => {
               />
               <Card.Content>
                 {upcomingAppointments.filter(apt =>
-                  new Date(apt.date).toDateString() === new Date().toDateString()
+                  new Date(apt.scheduled_time).toDateString() === new Date().toDateString()
                 ).length > 0 ? (
                   <div className="space-y-3">
                     {upcomingAppointments
-                      .filter(apt => new Date(apt.date).toDateString() === new Date().toDateString())
+                      .filter(apt => new Date(apt.scheduled_time).toDateString() === new Date().toDateString())
                       .map(apt => (
                         <div key={apt.id} className="flex items-center p-3 border rounded-lg">
                           <div className="w-14 text-center">
-                            <div className="text-lg font-bold">{apt.startTime}</div>
+                            <div className="text-lg font-bold">{apt.scheduled_time}</div>
                           </div>
                           <div className="ml-4 flex-1">
-                            <div className="font-medium">{apt.patientName}</div>
+                            <div className="font-medium">{apt.patient}</div>
                             <div className="text-sm text-gray-500">{apt.reason}</div>
                           </div>
                           <Button

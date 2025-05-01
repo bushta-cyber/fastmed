@@ -34,14 +34,14 @@ export interface Doctor extends User {
 export interface Appointment {
   id: string;
   patientId: string;
-  patientName: string;
+  patient: string;
   doctorId: string;
-  doctorName: string;
-  date: string;
-  startTime: string;
-  endTime: string;
+  doctor: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  created_at: string;
   status: 'scheduled' | 'completed' | 'cancelled' | 'in-progress';
-  type: 'video' | 'in-person';
+  visit_type: 'video' | 'in-person';
   reason: string;
   notes?: string;
 }
@@ -49,11 +49,11 @@ export interface Appointment {
 // Medical Record Types
 export interface MedicalRecord {
   id: string;
-  patientId: string;
-  doctorId: string;
+  patient: string;
+  doctor: string;
   date: string;
   diagnosis: string;
-  symptoms: string[];
+  symptoms:  { [key: string]: string };
   notes: string;
   prescriptions?: Prescription[];
   attachments?: Attachment[];

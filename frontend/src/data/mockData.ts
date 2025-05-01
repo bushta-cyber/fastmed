@@ -1,12 +1,12 @@
-import { 
-  User, 
-  Patient, 
-  Doctor, 
-  Appointment, 
-  MedicalRecord, 
-  Prescription, 
-  Message, 
-  Conversation 
+import {
+  User,
+  Patient,
+  Doctor,
+  Appointment,
+  MedicalRecord,
+  Prescription,
+  Message,
+  Conversation
 } from '../types';
 
 // Mock Users
@@ -120,22 +120,22 @@ export const mockAppointments: Appointment[] = [
   {
     id: 'apt1',
     patientId: 'p1',
-    patientName: 'Jane Doe',
+    patient: 'Jane Doe',
     doctorId: 'd1',
-    doctorName: 'Dr. John Smith',
-    date: '2025-06-15',
-    startTime: '10:00',
-    endTime: '10:30',
+    doctor: 'Dr. John Smith',
+    scheduled_date: '2025-06-15',
+    scheduled_time: '10:00',
+    created_at: '10:30',
     status: 'scheduled',
-    type: 'video',
+    visit_type: 'video',
     reason: 'Regular checkup',
   },
   {
     id: 'apt2',
     patientId: 'p2',
-    patientName: 'Robert Johnson',
+    patient: 'Robert Johnson',
     doctorId: 'd2',
-    doctorName: 'Dr. Sarah Williams',
+    doctor: 'Dr. Sarah Williams',
     date: '2025-06-14',
     startTime: '14:00',
     endTime: '14:30',
@@ -146,9 +146,9 @@ export const mockAppointments: Appointment[] = [
   {
     id: 'apt3',
     patientId: 'p1',
-    patientName: 'Jane Doe',
+    patient: 'Jane Doe',
     doctorId: 'd2',
-    doctorName: 'Dr. Sarah Williams',
+    doctor: 'Dr. Sarah Williams',
     date: '2025-06-10',
     startTime: '11:00',
     endTime: '11:30',

@@ -6,6 +6,7 @@ export const getCurrentUser = async () => {
   const token = localStorage.getItem('access');
   if (!token) throw new Error('No user authenticated');
 
+  
   const response = await axios.get(`${API_URL}/api/me/`, {
     headers: { Authorization: `Bearer ${token}` }
   });

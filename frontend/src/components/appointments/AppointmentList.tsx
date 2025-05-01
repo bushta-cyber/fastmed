@@ -22,12 +22,12 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [filter, setFilter] = useState<FilterOption>('upcoming');
-  
+
   const filteredAppointments = appointments.filter(appointment => {
-    const appointmentDate = new Date(appointment.date);
+    const appointmentDate = new Date(appointment.scheduled_date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     switch (filter) {
       case 'upcoming':
         return appointmentDate >= today && appointment.status !== 'cancelled';
@@ -39,14 +39,14 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
         return true;
     }
   });
-  
+
   // Sort appointments by date (most recent first for upcoming, oldest first for past)
   filteredAppointments.sort((a, b) => {
-    const dateA = new Date(`${a.date} ${a.startTime}`);
-    const dateB = new Date(`${b.date} ${b.startTime}`);
+    const dateA = new Date(`${a.scheduled_date} ${a.scheduled_time}`);
+    const dateB = new Date(`${b.scheduled_date} ${b.scheduled_time}`);
     return filter === 'past' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime();
   });
-  
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -80,7 +80,7 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
             Past
           </Button>
         </div>
-        
+
         <div className="flex gap-2">
           <Button
             variant={viewMode === 'list' ? 'primary' : 'outline'}
@@ -100,7 +100,7 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
           </Button>
         </div>
       </div>
-      
+
       {viewMode === 'list' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAppointments.length > 0 ? (

@@ -17,16 +17,16 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
   onReschedule,
   onCancel,
 }) => {
-  const { date, startTime, endTime, doctorName, patientName, status, type, reason } = appointment;
-  
+  const {scheduled_date, scheduled_time, doctor, patient, status, visit_type, reason } = appointment;
+
   const isUpcoming = status === 'scheduled';
-  const isToday = new Date(date).toDateString() === new Date().toDateString();
-  
+  const isToday = new Date(scheduled_date).toDateString() === new Date().toDateString();
+
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
-  
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'scheduled':
@@ -41,7 +41,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
         return 'bg-gray-100 text-gray-800';
     }
   };
-  
+
   return (
     <Card className="transition-all duration-200 hover:shadow-md">
       <div className="flex justify-between items-start mb-3">
@@ -56,45 +56,45 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
           )}
         </div>
         <div className="flex items-center text-sm text-gray-500">
-          {type === 'video' ? (
+          {visit_type === 'video' ? (
             <Video className="h-4 w-4 mr-1 text-teal-500" />
           ) : (
             <MapPin className="h-4 w-4 mr-1 text-teal-500" />
           )}
-          <span>{type === 'video' ? 'Video Consultation' : 'In-person'}</span>
+          <span>{visit_type === 'video' ? 'Video Consultation' : 'In-person'}</span>
         </div>
       </div>
-      
+
       <h3 className="font-medium text-lg text-gray-900 mb-2">
         {reason}
       </h3>
-      
+
       <div className="space-y-3">
         <div className="flex items-center text-gray-600">
           <Calendar className="h-5 w-5 mr-2 text-gray-400" />
-          <span>{formatDate(date)}</span>
+          <span>{formatDate(scheduled_date)}</span>
         </div>
-        
+
         <div className="flex items-center text-gray-600">
           <Clock className="h-5 w-5 mr-2 text-gray-400" />
-          <span>{startTime} - {endTime}</span>
+          <span>{scheduled_date} - {scheduled_time}</span>
         </div>
-        
+
         <div className="py-3 border-t border-b border-gray-100">
           <p className="text-sm text-gray-500 mb-1">
-            {appointment.doctorId.startsWith('d') ? 'Doctor' : 'Patient'}
+            {appointment.doctor}
           </p>
           <p className="font-medium">
-            {appointment.doctorId.startsWith('d') ? doctorName : patientName}
+            {appointment.doctor}
           </p>
         </div>
       </div>
-      
+
       {isUpcoming && (
         <div className="mt-4 flex flex-wrap gap-2">
           {onJoin && (
-            <Button 
-              variant={isToday ? 'primary' : 'outline'} 
+            <Button
+              variant={isToday ? 'primary' : 'outline'}
               size="sm"
               onClick={() => onJoin(appointment)}
               leftIcon={<Video className="h-4 w-4" />}
@@ -102,20 +102,20 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
               Join Call
             </Button>
           )}
-          
+
           {onReschedule && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => onReschedule(appointment)}
             >
               Reschedule
             </Button>
           )}
-          
+
           {onCancel && (
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => onCancel(appointment)}
               className="text-red-600 hover:bg-red-50"
