@@ -155,3 +155,29 @@ Search for doctors by name or specialty.
 - Role-based access is enforced (e.g., only doctors can create availability).
 - Appointments and medical records are filtered based on the logged-in user.
 
+# SET UP
+
+## Clone
+
+```bash
+git clone https://github.com/quiesscent/q-telemed-kenya.git
+```
+
+## Frontend
+
+```bash
+cd frontend
+npm i
+npm run dev
+```
+
+## Backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+python manage.py runserver
+```
+
+## Author
+[Ephesians Lewis](https://the-quiesscent-hub.vercel.app)
