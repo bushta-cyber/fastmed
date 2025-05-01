@@ -35,7 +35,7 @@ class RecordService {
         }
       }
 
-  // Book a new Record
+  // Add  a new Record
   static async bookRecord(doctor: number, date: string, symptoms: string, notes: string, diagnosis:string, patient:number) {
     try {
       const response = await axios.post(API_URL, {
@@ -53,7 +53,6 @@ class RecordService {
       throw new Error('Failed to book Record');
     }
   }
-
 
   // Update the status of an Record (for doctors or admins)
   static async updateRecordStatus(RecordId: number, diagnosis: string, symptoms:string, notes:string) {

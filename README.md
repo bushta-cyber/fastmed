@@ -1,67 +1,157 @@
-# 🏥 Hospital Healthcare System 
+# 📘 Healthcare API Documentation
 
-## 🔧 Stack Overview
-- **Backend**: Django + Django Rest Framework (DRF)
-- **Auth**: JWT
-- **Database**: PostgreSQL or MySQL
-- **Docs**: Swagger/OpenAPI (via drf-spectacular)
-- **Testing**: pytest-django or DRF built-in tests
-- **Deployment**: Render
+## Authentication
 
----
+### `POST /register/`
+Register a new user.
 
-## 📦 Modular Apps & Features
+#### Request Body:
+```json
+{
+  "email": "user@example.com",
+  "full_name": "John Doe",
+  "role": "patient",  // or "doctor"
+  "password": "yourpassword"
+}
+```
 
-### 1. 🔐 Authentication & User Management
-- Email/password login
-- Custom user model (Patient / Doctor / Admin)
-- Secure session management
-- Profile management (edit/update for both roles)
-
-### 2. 🗓️ Appointment Management
-- Book/reschedule/cancel appointments
-- View upcoming/past appointments
-- Support for in-person and virtual visits
-- Link appointments to doctors and patients
-
-### 3. 🧾 Medical Records
-- Access complete medical history
-- View test results and diagnosis
-- Download medical documents
-- Organize records by date/type
-
-### 4. 🧑‍⚕️ Doctor Search
-- Search by name or specialty
-- View doctor profiles
-- Check doctor availability
-- Book appointment directly from profile
-- Read patient reviews
-
-### 5. 💊 Prescription Management
-- View active and past prescriptions
-- Track medication schedules
-- Request prescription refills
-
-### 6. 📹 Telemedicine
-- Virtual waiting room
-- Video consultation setup
-- Communication/chat feature
-- Pre-consultation checklist
-- Post-consultation summary
-
-### 7. 📅 User Interface Support (Backend Side)
-- Real-time notification triggers (e.g., appointment booked)
-- Interactive calendar integration
-- Responsive data endpoints
-- Accessibility-ready structures
-
-### 8. 🚨 Emergency Services
-- First aid info
-- Emergency guidelines (static content via admin)
-
-### 9. 🌿 Health Resources
-- Health tips and educational content
+#### Response:
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "full_name": "John Doe",
+  "role": "patient"
+}
+```
 
 ---
 
-## 🛠️ What's Next?
+### `GET /profile/`
+Retrieve the authenticated user's profile.
+
+#### Headers:
+- `Authorization: Bearer <token>`
+
+#### Response:
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "full_name": "John Doe",
+  "role": "doctor"
+}
+```
+
+---
+
+## Availability
+
+### `GET /availability/`
+List all availability entries (authenticated doctor).
+
+### `POST /availability/`
+Create new availability slot (doctors only).
+
+#### Request Body:
+```json
+{
+  "date": "2025-05-10",
+  "start_time": "09:00",
+  "end_time": "12:00"
+}
+```
+
+---
+
+## Appointments
+
+### `GET /appointments/`
+Get all appointments related to the logged-in user.
+
+### `POST /appointments/`
+Create a new appointment (patients only).
+
+#### Request Body:
+```json
+{
+  "doctor": 2,
+  "scheduled_time": "2025-05-12T10:00:00Z",
+  "reason": "Regular check-up",
+  "visit_type": "in-person"
+}
+```
+
+### `PATCH /appointments/{id}/`
+Update an appointment (only if status is `pending`).
+
+---
+
+## Medical Records
+
+### `GET /medical-records/`
+Retrieve medical records:
+- Patients see their own records.
+- Doctors see records they authored.
+
+### `POST /medical-records/`
+Create a medical record (doctors only).
+
+#### Request Body:
+```json
+{
+  "patient": 3,
+  "diagnosis": "Malaria",
+  "symptoms": ["Fever", "Headache"],
+  "notes": "Patient needs to hydrate."
+}
+```
+
+---
+
+## Prescriptions
+
+### `GET /prescriptions/`
+List all prescriptions (doctor or patient).
+
+### `POST /prescriptions/`
+Create a prescription (linked to a medical record).
+
+#### Request Body:
+```json
+{
+  "medical_record": 5,
+  "medication_name": "Panadol",
+  "dosage": "500mg twice daily"
+}
+```
+
+---
+
+## Doctor Search
+
+### `GET /doctors/?search=john&specialty=cardiology`
+Search for doctors by name or specialty.
+
+#### Response:
+```json
+[
+  {
+    "id": 1,
+    "user": {
+      "full_name": "Dr. John Doe",
+      "email": "john@example.com"
+    },
+    "specialty": "Cardiology",
+    "bio": "Experienced cardiologist."
+  }
+]
+```
+
+---
+
+## Notes
+- Authentication is required for all endpoints except registration.
+- Role-based access is enforced (e.g., only doctors can create availability).
+- Appointments and medical records are filtered based on the logged-in user.
+

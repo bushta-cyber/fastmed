@@ -4,7 +4,7 @@ import { Calendar, MessageSquare, Clock, BarChart2, Users, PlusCircle } from 'lu
 import { useAuth } from '../context/AuthContext';
 import { mockAppointments, mockDoctors, mockMedicalRecords } from '../data/mockData';
 import Card from '../components/ui/Card';
-import AppointmentCard from '../components/appointments/AppointmentCard';
+// import AppointmentCard from '../components/appointments/AppointmentCard';
 import AppointmentService from '../services/appointmentService';
 import Button from '../components/ui/Button';
 import { Appointment } from '../types';
@@ -13,7 +13,7 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [appointments, setAppointments] = useState<Appointment[]>([])
-  const [error, setError] = useState('');
+  // const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -21,7 +21,7 @@ const DashboardPage: React.FC = () => {
         const data = await AppointmentService.getAppointments();
         setAppointments(data);
       } catch (err) {
-        setError('Failed to load appointments');
+        // setError('Failed to load appointments');
       }
     };
 
@@ -43,7 +43,7 @@ const DashboardPage: React.FC = () => {
   // Get recent medical records if user is a patient
   const recentMedicalRecords = user?.role === 'patient'
     ? mockMedicalRecords
-        .filter(record => Number(record.patientId) === user.id)
+        .filter(record => Number(record.patient) === user.id)
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 2)
     : [];
@@ -225,7 +225,7 @@ const DashboardPage: React.FC = () => {
                         <div className="flex justify-between">
                           <div>
                             <h5 className="font-medium text-sm">{record.diagnosis}</h5>
-                            <p className="text-xs text-gray-500">Dr. {mockDoctors.find(d => d.id === record.doctorId)?.name.split(' ')[1]}</p>
+                            <p className="text-xs text-gray-500">Dr. {mockDoctors.find(d => d.id === record.doctor)?.name.split(' ')[1]}</p>
                           </div>
                           <span className="text-xs text-gray-500">{formatDate(record.date)}</span>
                         </div>
